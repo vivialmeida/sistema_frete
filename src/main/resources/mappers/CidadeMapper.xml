@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="br.com.frete.mapper.CidadeMapper">
+
+    <resultMap id="cidadeMap" type="br.com.frete.model.Cidade">
+        <result column="ft01b_id" property="id"/>
+        <result column="ft01b_nome" property="nome"/>
+        <result column="ft01b_taxa" property="taxa"/>
+        <result column="ft01b_uf" property="uf"/>
+    </resultMap>
+
+    <insert id="salvaCidade" parameterType="br.com.frete.model.Cidade" useGeneratedKeys="true"
+            keyColumn="ft01b_id" keyProperty="cidade.id">
+        INSERT INTO frete.ft01b_cidade
+            (ft01b_id, ft01b_nome, ft01b_taxa, ft01b_uf)
+        VALUES
+            (
+                DEFAULT,
+                #{cidade.nome},
+                #{cidade.taxa},
+                #{cidade.uf}
+            )
+    </insert>
+
+    <select id="buscaTodasAsCidades" resultMap="cidadeMap">
+        SELECT
+            ft01b_id, ft01b_nome, ft01b_uf, ft01b_taxa
+        FROM
+            frete.ft01b_cidade
+    </select>
+
+    <select id="buscaPor" resultMap="cidadeMap">
+        <bind name="pattern" value="'%' + nome + '%'" />
+        SELECT
+            ft01b_id, ft01b_nome, ft01b_uf, ft01b_taxa
+        FROM
+            frete.ft01b_cidade
+        WHERE ft01b_nome LIKE #{pattern}
+    </select>
+
+    <select id="buscaCidadePor" resultMap="cidadeMap">
+        SELECT
+            ft01b_id, ft01b_nome, ft01b_uf, ft01b_taxa
+        FROM
+            frete.ft01b_cidade
+        WHERE ft01b_id = #{id}
+    </select>
+
+    <select id="buscaACidadeComOMaiorNumeroDeFretes" resultMap="cidadeMap">
+        SELECT ft01b_id,
+               ft01b_nome,
+               ft01b_uf,
+               ft01b_taxa
+        FROM frete.ft01b_cidade cid
+                 inner join (select ft01c_id_cidade, count(*) as total
+                             from frete.ft01c_frete
+                             group by ft01c_id_cidade) as temp
+                            on ft01c_id_cidade = ft01b_id
+        ORDER BY temp.total desc
+        limit 1
+    </select>
+
+</mapper>

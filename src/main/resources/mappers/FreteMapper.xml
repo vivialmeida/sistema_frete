@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="br.com.frete.mapper.FreteMapper">
+
+    <resultMap id="freteMap" type="br.com.frete.model.Frete">
+        <result column="ft01c_id"           property="id"/>
+        <result column="ft01c_descricao"    property="descricao"/>
+        <result column="ft01c_peso"         property="peso"/>
+        <result column="ft01c_valor"        property="valor"/>
+
+        <association property="cidade" javaType="br.com.frete.model.Cidade">
+            <result column="ft01b_id"       property="id"/>
+            <result column="ft01b_nome"     property="nome"/>
+            <result column="ft01b_taxa"     property="taxa"/>
+            <result column="ft01b_uf"       property="uf"/>
+        </association>
+
+        <association property="cliente" javaType="br.com.frete.model.Cliente">
+            <result column="ft01a_id"       property="id"/>
+            <result column="ft01a_nome"     property="nome"/>
+            <result column="ft01a_endereco" property="endereco"/>
+            <result column="ft01a_telefone" property="telefone"/>
+        </association>
+
+    </resultMap>
+
+    <insert id="salvaFrete" parameterType="br.com.frete.model.Frete" useGeneratedKeys="true"
+            keyColumn="ft01c_id" keyProperty="frete.id">
+
+        INSERT INTO frete.ft01c_frete
+            (ft01c_id, ft01c_id_cliente, ft01c_id_cidade, ft01c_descricao, ft01c_peso, ft01c_valor)
+        VALUES
+            (
+                DEFAULT,
+                #{frete.cliente.id},
+                #{frete.cidade.id},
+                #{frete.descricao},
+                #{frete.peso},
+                #{frete.valor}
+            )
+    </insert>
+
+    <select id="buscaTodosOsFretes" resultMap="freteMap">
+        select ft01c_id,
+               ft01c_descricao,
+               ft01c_peso,
+               ft01c_valor,
+               ft01b_id,
+               ft01b_nome,
+               ft01b_taxa,
+               ft01b_uf,
+               ft01a_id,
+               ft01a_nome,
+               ft01a_endereco,
+               ft01a_telefone
+        from frete.ft01c_frete fre
+                 inner join frete.ft01b_cidade cid
+                            on fre.ft01c_id_cidade = cid.ft01b_id
+                 inner join frete.ft01a_cliente cli
+                            on fre.ft01c_id_cliente = cli.ft01a_id
+    </select>
+
+    <select id="buscaFreteDeMaiorValor" resultMap="freteMap">
+        select ft01c_id,
+               ft01c_descricao,
+               ft01c_peso,
+               ft01c_valor,
+               ft01b_id,
+               ft01b_nome,
+               ft01b_taxa,
+               ft01b_uf,
+               ft01a_id,
+               ft01a_nome,
+               ft01a_endereco,
+               ft01a_telefone
+        from frete.ft01c_frete fre
+                 inner join frete.ft01b_cidade cid
+                            on fre.ft01c_id_cidade = cid.ft01b_id
+                 inner join frete.ft01a_cliente cli
+                            on fre.ft01c_id_cliente = cli.ft01a_id
+        where ft01c_valor = (
+            select max(ft01c_valor)
+            from frete.ft01c_frete
+        )
+        limit 1
+    </select>
+
+    <select id="buscaFreteDoCliente" resultMap="freteMap">
+        select ft01c_id,
+               ft01c_descricao,
+               ft01c_peso,
+               ft01c_valor,
+               ft01b_id,
+               ft01b_nome,
+               ft01b_taxa,
+               ft01b_uf,
+               ft01a_id,
+               ft01a_nome,
+               ft01a_endereco,
+               ft01a_telefone
+        from frete.ft01c_frete fre
+                 inner join frete.ft01b_cidade cid
+                            on fre.ft01c_id_cidade = cid.ft01b_id
+                 inner join frete.ft01a_cliente cli
+                            on fre.ft01c_id_cliente = cli.ft01a_id
+        where ft01c_id_cliente = #{clienteId}
+    </select>
+
+
+</mapper>

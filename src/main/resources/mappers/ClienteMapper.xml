@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="br.com.frete.mapper.ClienteMapper">
+
+    <resultMap id="clienteMap" type="br.com.frete.model.Cliente">
+        <result column="ft01a_id" property="id"/>
+        <result column="ft01a_nome" property="nome"/>
+        <result column="ft01a_endereco" property="endereco"/>
+        <result column="ft01a_telefone" property="telefone"/>
+    </resultMap>
+
+    <insert id="salvaCliente" parameterType="br.com.frete.model.Cliente" useGeneratedKeys="true"
+            keyColumn="ft01a_id" keyProperty="cliente.id">
+        INSERT INTO frete.ft01a_cliente
+            (ft01a_id, ft01a_nome, ft01a_endereco, ft01a_telefone)
+        VALUES
+            (
+                DEFAULT,
+                #{cliente.nome},
+                #{cliente.endereco},
+                #{cliente.telefone}
+            )
+    </insert>
+
+    <select id="buscaTodosOsClientes" resultMap="clienteMap">
+        SELECT
+            ft01a_id, ft01a_nome, ft01a_endereco, ft01a_telefone
+        FROM
+            frete.ft01a_cliente
+    </select>
+
+    <select id="buscaClientePor" resultMap="clienteMap">
+        SELECT
+            ft01a_id, ft01a_nome, ft01a_endereco, ft01a_telefone
+        FROM
+            frete.ft01a_cliente
+        WHERE ft01a_id = #{id}
+    </select>
+
+    <select id="buscaClientesPorTelefone" resultMap="clienteMap">
+        SELECT
+            ft01a_id, ft01a_nome, ft01a_endereco, ft01a_telefone
+        FROM
+            frete.ft01a_cliente
+        WHERE ft01a_telefone = #{telefone}
+    </select>
+
+
+</mapper>
